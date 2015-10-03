@@ -64,7 +64,7 @@ public class TripServiceTest {
     private class TestableTripService extends TripService {
 
         @Override
-        protected User getLoggedUser() {
+        protected User getLoggedInUser() {
             return loggedInUser;
         }
 
