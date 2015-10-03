@@ -1,5 +1,6 @@
-package org.craftedsw.tripservicekata.trip;
+package org.craftedsw.tripservicekata.builder;
 
+import org.craftedsw.tripservicekata.trip.Trip;
 import org.craftedsw.tripservicekata.user.User;
 
 /**

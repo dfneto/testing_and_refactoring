@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.craftedsw.tripservicekata.trip.UserBuilder.aUser;
+import static org.craftedsw.tripservicekata.builder.UserBuilder.aUser;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
