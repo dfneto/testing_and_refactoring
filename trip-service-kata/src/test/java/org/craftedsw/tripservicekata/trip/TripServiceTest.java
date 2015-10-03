@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.craftedsw.tripservicekata.trip.UserBuilder.aUser;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -24,23 +25,23 @@ public class TripServiceTest {
     @Before
     public void initialize(){
         tripService = new TestableTripService();
+        loggedInUser = REGISTERED_USER;
     }
 
     @Test(expected = UserNotLoggedInException.class) public void
     should_validate_the_logged_in_user() {
         loggedInUser = GUEST;
-        
+
         tripService.getTripsByUser(SOME_USER);
 
     }
 
     @Test public void
     should_not_return_any_trips_when_user_are_not_friends() {
-        loggedInUser = REGISTERED_USER;
-
-        User stranger = new User();
-        stranger.addFriend(ANOTHER_USER);
-        stranger.addTrip(BRAZIL);
+        User stranger = aUser()
+                                    .friendsWith(ANOTHER_USER)
+                                    .withTripsTo(BRAZIL)
+                                    .build();
 
         List<Trip> trips = tripService.getTripsByUser(stranger);
 
@@ -49,13 +50,11 @@ public class TripServiceTest {
 
     @Test public void
     should_return_trips_when_users_are_friends() {
-        loggedInUser = REGISTERED_USER;
 
-        User friend = new User();
-        friend.addFriend(ANOTHER_USER);
-        friend.addFriend(REGISTERED_USER);
-        friend.addTrip(BRAZIL);
-        friend.addTrip(LONDON);
+        User friend = aUser()
+                                .friendsWith(ANOTHER_USER, REGISTERED_USER)
+                                .withTripsTo(BRAZIL, LONDON)
+                                .build();
 
         List<Trip> trips = tripService.getTripsByUser(friend);
 
