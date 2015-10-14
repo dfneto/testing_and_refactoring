@@ -2,15 +2,20 @@ package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.craftedsw.tripservicekata.builder.UserBuilder.aUser;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TripServiceTest {
 
     private static final User GUEST = null;
@@ -19,12 +24,9 @@ public class TripServiceTest {
     private static final User ANOTHER_USER = new User();
     private static final Trip BRAZIL = new Trip();
     private static final Trip LONDON = new Trip();
-    private TripService tripService;
 
-    @Before
-    public void initialize(){
-        tripService = new TestableTripService();
-    }
+    @Mock private TripDAO tripDAO;
+    @InjectMocks private TripService tripService = new TripService();
 
     @Test(expected = UserNotLoggedInException.class) public void
     should_validate_the_logged_in_user() {
@@ -41,6 +43,7 @@ public class TripServiceTest {
         List<Trip> trips = tripService.getTripsByUser(stranger, REGISTERED_USER);
 
         assertThat(trips.size(), is(0));
+        //pq ele retorna zero????
     }
 
     @Test public void
@@ -50,19 +53,11 @@ public class TripServiceTest {
                                 .friendsWith(ANOTHER_USER, REGISTERED_USER)
                                 .withTripsTo(BRAZIL, LONDON)
                                 .build();
+        given(tripDAO.tripsBy(friend)).willReturn(friend.trips());
 
         List<Trip> trips = tripService.getTripsByUser(friend, REGISTERED_USER);
 
         assertThat(trips.size(), is(2));
     }
-
-    private class TestableTripService extends TripService {
-
-        @Override
-        protected List<Trip> tripsBy(User user) {
-            return user.trips();
-        }
-    }
-
 
 }
