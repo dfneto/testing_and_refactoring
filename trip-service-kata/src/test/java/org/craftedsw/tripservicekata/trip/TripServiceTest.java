@@ -18,19 +18,23 @@ import static org.mockito.BDDMockito.given;
 @RunWith(MockitoJUnitRunner.class)
 public class TripServiceTest {
 
-    private static final User GUEST = null;
-    private static final User SOME_USER = new User();
-    private static final User REGISTERED_USER = new User();
-    private static final User ANOTHER_USER = new User();
-    private static final Trip BRAZIL = new Trip();
-    private static final Trip LONDON = new Trip();
-
-    @Mock private TripDAO tripDAO;
-    @InjectMocks private TripService tripService = new TripService();
-
     @Test(expected = UserNotLoggedInException.class) public void
     should_validate_the_logged_in_user() {
         tripService.getTripsByUser(SOME_USER, GUEST);
+    }
+
+    @Test public void
+    should_return_trips_when_users_are_friends() {
+
+        User friend = aUser()
+                .friendsWith(ANOTHER_USER, REGISTERED_USER)
+                .withTripsTo(BRAZIL, LONDON)
+                .build();
+        given(tripDAO.tripsBy(friend)).willReturn(friend.trips());
+
+        List<Trip> trips = tripService.getTripsByUser(friend, REGISTERED_USER);
+
+        assertThat(trips.size(), is(2));
     }
 
     @Test public void
@@ -43,21 +47,17 @@ public class TripServiceTest {
         List<Trip> trips = tripService.getTripsByUser(stranger, REGISTERED_USER);
 
         assertThat(trips.size(), is(0));
-        //pq ele retorna zero????
     }
 
-    @Test public void
-    should_return_trips_when_users_are_friends() {
 
-        User friend = aUser()
-                                .friendsWith(ANOTHER_USER, REGISTERED_USER)
-                                .withTripsTo(BRAZIL, LONDON)
-                                .build();
-        given(tripDAO.tripsBy(friend)).willReturn(friend.trips());
+    private static final User GUEST = null;
+    private static final User SOME_USER = new User();
+    private static final User REGISTERED_USER = new User();
+    private static final User ANOTHER_USER = new User();
+    private static final Trip BRAZIL = new Trip();
+    private static final Trip LONDON = new Trip();
 
-        List<Trip> trips = tripService.getTripsByUser(friend, REGISTERED_USER);
-
-        assertThat(trips.size(), is(2));
-    }
+    @Mock private TripDAO tripDAO;
+    @InjectMocks private TripService tripService = new TripService();
 
 }
